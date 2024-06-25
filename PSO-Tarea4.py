@@ -60,7 +60,7 @@ def init():
     ax.set_ylim(-7, 7)
     ax.grid()
     ax.legend()
-    print('-------- Inicialización ASADS --------')
+    print('-------- Inicialización --------')
     for i in range(num_particulas):
         print(f'Partícula {i+1}\n'
               f'x : ({x[i][0]:.1f}, {x[i][1]:.1f})\n'
@@ -76,10 +76,7 @@ def init():
 
 def update(frame):
     global x, v, x_star, f_x, x_g
-    if frame == 0:
-        print('-------- Inicialización --------')
-    else:
-        print(f'-------- Iteración {frame} --------')
+    print(f'-------- Iteración {frame+1} --------')
     t = frame + 1
     leg = ax.get_legend()
     leg.remove()
@@ -98,26 +95,27 @@ def update(frame):
         )
         ln.set_label(info)
         ln.set_zorder(3)
-    for j in range(num_particulas):
-        # Actualizar velocidad y posición
-        v[j] = a(t)*v[j] + a0 * (r_1 * (x_star[j] - x[j]) + r_2 * (x_g - x[j]))
-        x[j] += v[j]
-        # Evaluar la función objetivo
-        f_x_j = f(x[j])
-        # Actualizar el valor de x* y xg si es necesario
-        if f_x_j < f_x[j]:
-            x_star[j] = x[j]
-            f_x[j] = f_x_j
-        if f_x_j < f(x_g):
-            x_g = x[j].copy()
-        print(
-            f'Partícula {j+1}\n'
-            f'x : ({x[j][0]:.1f}, {x[j][1]:.1f})\n'
-            f'v : ({v[j][0]:.1f}, {v[j][1]:.1f})\n'
-            f'x*: ({x_star[j][0]:.1f}, {x_star[j][1]:.1f})'
-        )
-    print(f'xg: ({x_g[0]:.1f}, {x_g[1]:.1f})')
-    return lns + [title]
+    if frame <= max_iter:
+        for j in range(num_particulas):
+            # Actualizar velocidad y posición
+            v[j] = a(t)*v[j] + a0 * (r_1 * (x_star[j] - x[j]) + r_2 * (x_g - x[j]))
+            x[j] += v[j]
+            # Evaluar la función objetivo
+            f_x_j = f(x[j])
+            # Actualizar el valor de x* y xg si es necesario
+            if f_x_j < f_x[j]:
+                x_star[j] = x[j]
+                f_x[j] = f_x_j
+            if f_x_j < f(x_g):
+                x_g = x[j].copy()
+            print(
+                f'Partícula {j+1}\n'
+                f'x : ({x[j][0]:.1f}, {x[j][1]:.1f})\n'
+                f'v : ({v[j][0]:.1f}, {v[j][1]:.1f})\n'
+                f'x*: ({x_star[j][0]:.1f}, {x_star[j][1]:.1f})'
+            )
+        print(f'xg: ({x_g[0]:.1f}, {x_g[1]:.1f})')
+        return lns + [title]
     
 # Crear la animación
 ani = FuncAnimation(fig, update, frames=range(max_iter+1), 
